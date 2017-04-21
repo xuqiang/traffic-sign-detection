@@ -181,16 +181,41 @@ layer {
     bias_filler { type: "constant" value: 0 }
   }
 }
+
+layer {
+  name: "rpn_conv2"
+  type: "Convolution"
+  bottom: "conv3"
+  top: "rpn_conv2"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  convolution_param {
+    num_output: 256
+    kernel_size: 3 pad: 1 stride: 1
+    weight_filler { type: "gaussian" std: 0.01 }
+    bias_filler { type: "constant" value: 0 }
+  }
+}
+
 layer {
   name: "rpn_relu1"
   type: "ReLU"
   bottom: "rpn_conv1"
   top: "rpn_conv1"
 }
+
+layer {
+  name: "rpn_relu2"
+  type: "ReLU"
+  bottom: "rpn_conv2"
+  top: "rpn_conv2"
+}
+
 layer {
   name: "rpn_cls_score"
   type: "Convolution"
   bottom: "rpn_conv1"
+  bottom: "rpn_conv2"
   top: "rpn_cls_score"
   param { lr_mult: 1.0 }
   param { lr_mult: 2.0 }
@@ -205,6 +230,7 @@ layer {
   name: "rpn_bbox_pred"
   type: "Convolution"
   bottom: "rpn_conv1"
+  bottom: "rpn_conv2"
   top: "rpn_bbox_pred"
   param { lr_mult: 1.0 }
   param { lr_mult: 2.0 }
